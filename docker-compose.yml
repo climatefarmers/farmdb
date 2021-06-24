@@ -2,7 +2,7 @@ version: "3.9"
    
 services:
   db:
-    image: postgres
+    image: postgis/postgis
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
@@ -16,7 +16,7 @@ services:
     build: 
         context: .
         dockerfile: ./farmdb.Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh entrypoint.sh
     ports:
       - "8000:8000"
     volumes:
