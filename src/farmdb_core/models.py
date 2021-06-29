@@ -5,16 +5,26 @@ from address.models import AddressField
 
 # Create your models here.
 class Farm(models.Model):
-    farm_name = models.CharField(max_length=64)
-    farm_address = AddressField(on_delete=models.CASCADE)
+    name = models.CharField(max_length=64)
     description = models.TextField(max_length=2048)
+    #website = 
+    #team_size =
+    #farm_size_approx = 
+    #main_products = 
+    #date_joined = 
+    #public_profile =
+    #pictures =
+    #video = 
+
+    farm_address = AddressField(on_delete=models.CASCADE, null=True)
 
 class Person(models.Model):
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
     email = models.EmailField(max_length=128)
     # TODO: telephone w. sms validation
-    address = AddressField(on_delete=models.CASCADE)
+    #telephone = 
+    address = AddressField(on_delete=models.CASCADE, null=True)
 
 class Field(models.Model):
     field_name = models.CharField(max_length=32)

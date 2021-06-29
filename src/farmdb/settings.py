@@ -88,6 +88,9 @@ DATABASES = {
     }
 }
 
+# Api key for django-adress validation
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
