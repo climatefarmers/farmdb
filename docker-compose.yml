@@ -9,6 +9,8 @@ services:
       - POSTGRES_DB=${PGNAME}
       - POSTGRES_USER=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASS}
+    ports:
+      - "5432:5432"
     env_file:
       - .env
   web:

@@ -72,7 +72,7 @@ class Person(models.Model):
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
     email = models.EmailField(max_length=128)
-    telephone = models.CharField(max_length=16)
+    phone = models.CharField(max_length=16)
     # Relations:
     address = AddressField(on_delete=models.CASCADE, null=True)
     comm_pref = models.ForeignKey(
