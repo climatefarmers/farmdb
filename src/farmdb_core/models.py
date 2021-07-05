@@ -47,7 +47,7 @@ class Organization(models.Model):
 
 class Farm(Organization):
     # Farm specific information: 
-    farm_size_approx = models.IntegerField()
+    farm_size_approx = models.IntegerField(null=True)
     date_joined = models.DateField(auto_now_add=True)
     public_profile = models.BooleanField(default=False)
     # Relations: 
