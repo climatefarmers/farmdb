@@ -14,5 +14,5 @@ def survey_response_body():
 
 def test_survey_parser(survey_response_body):
     parsed = parse_survey(survey_response_body)
-    assert parsed['email'] == "an_account@example.com"
-    assert parsed['comm_pref'] == ["Barcelona"]
+    assert parsed['person']['email'] == "an_account@example.com"
+    assert parsed['person']['comm_pref']['comm_channel'] == 2

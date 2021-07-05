@@ -1,4 +1,5 @@
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -50,66 +51,172 @@ choices_answer {
 
 """
 
+FARMER_ROLE_ID = 1
+MISSING_STREET_NR = -99
+
 question_index = {
-    'lBUQO8sOX12x' : 'full_name',
-    'gu1WRpwodKDM' : 'email',
-    'rdSMIPaen13X' : 'phone',
-    'FUbrknB8bw1r' : 'farm_name',
-    'uzugPvjVFU2F' : 'farm_website',
-    'BxLQkXrnalNC' : 'street',
-    '3Bh3mTnRojgi' : 'city',
-    'TH0TmwYqIOlW' : 'country',
-    'XTQrsUU9IvoK' : 'comm_pref',
-    '7AIAa8JbmMzd' : 'farm_description',
-    'DsEKgxgmmbXi' : 'production_methods',
-    'dxFiOS8gg3pq' : 'main_products',
-    'xTTq3HponTHi' : 'farm_size_approx',
-    'VdUp9RxHGy6t' : 'soil',
-    'ugKrLtCARW2r' : 'tillage',
-    'v1RIdlGEDiOT' : 'fertilization',
-    'jaTU4yiTzorr' : 'irrigation',
-    'GC0ocjfxDxXa' : 'uses_icides',
-    '0Eno9oaL2iTf' : 'receives_funding',
+    'lBUQO8sOX12x': 'full_name',  # -> first_name, last_name
+    'gu1WRpwodKDM': 'email',
+    'rdSMIPaen13X': 'phone',
+    'FUbrknB8bw1r': 'farm_name',
+    'uzugPvjVFU2F': 'farm_website',
+    'BxLQkXrnalNC': 'street',
+    '3Bh3mTnRojgi': 'city',
+    'TH0TmwYqIOlW': 'country',
+    'XTQrsUU9IvoK': 'comm_pref',
+    '7AIAa8JbmMzd': 'farm_type',
+    'DsEKgxgmmbXi': 'production_methods',
+    'dxFiOS8gg3pq': 'main_products',
+    'xTTq3HponTHi': 'farm_size_approx',
+    'VdUp9RxHGy6t': 'soil',
+    'ugKrLtCARW2r': 'tillage',
+    'v1RIdlGEDiOT': 'fertilization',
+    'jaTU4yiTzorr': 'irrigation',
+    'GC0ocjfxDxXa': 'uses_icides',
+    '0Eno9oaL2iTf': 'receives_funding',
 }
 
 
+def determine_answer_content(answer):
+    answer_type = answer['type']
+    if answer_type == 'choices':
+        return answer[answer_type]['labels']
+    elif answer_type == 'choice':
+        return answer[answer_type]['label']
+    return answer[answer_type]
 
-def parse_survey(survey_body: dict) -> dict:
+
+def split_name(full_name):
+    name_parts = full_name.split(' ')
+    return ' '.join(name_parts[:-1]), name_parts[-1]
+
+
+def split_street(street):
+    splits = re.split(r'(?<=\d)(?:-\d+)?\s+', street)
+    if len(splits) == 1:
+        return MISSING_STREET_NR, splits[0]
+    return splits
+
+
+def lookup_comm_pref(comm_pref):
+    options = {
+        "Phone Call" : 1,
+        "Email" : 2,
+        "WhatsApp" : 3
+    }
+    return options.get(comm_pref[0], 2) # default to email
+
+
+def flatten_survey(survey_body: dict) -> dict:
     """Parses survey responses as sent by the TypeForm webhook.
 
     Args:
         survey_body (dict): The survey body a sent by TypeForm webhook
 
     Returns:
-        dict: Parsed answers
+        dict: flattened answers
     """
-    fields = {f.pop('id'): f for f in survey_body['form_response']['definition']['fields']}
+    fields = {
+        f.pop('id'): f for f in survey_body['form_response']['definition']['fields']}
     answers = survey_body['form_response']['answers']
-    parsed  = {}
+    flattened = {}
     for answer in answers:
         field_id = answer['field']['id']
-        answer_type = answer['type']
+
         field_prompt = fields[field_id]['title']
 
-        try: 
+        try:
             field_name = question_index[field_id]
         except KeyError as e:
-            logger.warning(f"Question ID {field_id} with prompt '{field_prompt}' not in question index.")
+            logger.warning(
+                f"Question ID {field_id} with prompt '{field_prompt}' not in question index.")
             continue
 
-        if answer_type == 'choices':
-            answer_content = answer[answer_type]['labels']
-        elif answer_type == 'choice':
-            answer_content = answer[answer_type]['label']
-        else:
-            answer_content = answer[answer_type]
+        answer_content = determine_answer_content(answer)
 
         if field_name == 'full_name':
-            name_parts = answer_content.split(' ')
-            first_name, last_name = ' '.join(name_parts[:-1]), name_parts[-1]
-            parsed['first_name'] = first_name
-            parsed['last_name'] = last_name
+            flattened['first_name'], flattened['last_name'] = split_name(answer_content)
+        elif field_name == 'street':
+            flattened['street_number'], flattened['route'] = split_street(answer_content)
+        elif field_name == 'comm_pref':
+            flattened[field_name] = lookup_comm_pref(answer_content)
+        elif field_name == 'farm_size_approx':
+            flattened[field_name] = int(answer_content) if answer_content.isdigit() else None
         else:
-            parsed[field_name] = answer_content
+            flattened[field_name] = answer_content
 
-    return parsed
+    return flattened
+
+
+def parse_address(**kwargs):
+    return {
+        'street_number': kwargs.get('street_number'),
+        'route': kwargs.get('route', ''),
+        'raw': ' '.join([str(e) for e in [
+            kwargs.get('route', ''),
+            kwargs.get('street_number', ''),
+            kwargs.get('city', ''),
+            kwargs.get('country', ''),
+        ]]),
+        'locality': {
+            'name': kwargs.get('city', ''),
+            'state': {
+                'name': kwargs.get('state', ''),
+                'country': {
+                    'name': kwargs.get('country', ''),
+                },
+            },
+        }
+    }
+
+
+def parse_person(**kwargs):
+    return {
+        'first_name': kwargs.get('first_name'),
+        'last_name': kwargs.get('last_name'),
+        'email': kwargs.get('email'),
+        'phone': kwargs.get('phone'),
+        'address': kwargs.get('address'),
+        'comm_pref': {
+            'comm_channel': kwargs.get('comm_pref'),
+        }
+    }
+
+
+def parse_survey_answers(**kwargs):
+    return {
+        'farm_type': kwargs.get('farm_type'),
+        'production_methods': kwargs.get('production_methods'),
+        'main_products': kwargs.get('main_products'),
+        'soil': kwargs.get('soil'),
+        'tillage': kwargs.get('tillage'),
+        'fertilization': kwargs.get('fertilization'),
+        'irrigation': kwargs.get('irrigation'),
+        'uses_icides': kwargs.get('uses_icides'),
+        'receives_funding': kwargs.get('receives_funding'),
+        }
+
+
+def parse_farm(**kwargs):
+    return {
+        'name': kwargs.get('farm_name'),
+        'website': kwargs.get('farm_website'),
+        'address': kwargs.get('address'),
+        'farm_size_approx': kwargs.get('farm_size_approx'),
+        'survey_answers': kwargs.get('survey_answers'),
+    }
+
+def parse_survey(survey_body: dict) -> dict:
+    flattened = flatten_survey(survey_body)
+
+    address = parse_address(**flattened)
+    person = parse_person(**flattened, address=address)
+    survey_answers = parse_survey_answers(**flattened)
+    farm = parse_farm(**flattened, address=address, survey_answers=survey_answers)    
+    return {
+        'person': person,
+        'organization':farm,
+        'role':{
+            'role' : FARMER_ROLE_ID
+        }
+    }
