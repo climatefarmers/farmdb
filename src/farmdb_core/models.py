@@ -5,19 +5,27 @@ from address.models import AddressField
 
 
 class SurveyAnswers(models.Model):
-    farm_type = models.JSONField() # Many of: convetional, organic EU, organic demeter, transitioning, regen, market gardening, vegan, other
-    production_methods = models.JSONField() # Many of: Agroforestry, Aquaculture, Beekeeping, etc
-    main_products = models.JSONField() # Many of: Meat, Fruits, Herbs, etc
-    soil = models.JSONField() # Many of Sandy, Silty, etc.
-    tillage = models.JSONField() # one of conventional, reduced, vertical, no-till
-    fertilization = models.JSONField() # many of: synthetic, organinc, cover crops, no other
-    irrigation = models.JSONField() # Many of: Surface, floos, sprinkler, etc.
-    uses_icides = models.BooleanField(null=True) # Yes or No to Pesticides, Herbicides, Fungicides, etc.
-    receives_funding = models.BooleanField(null=True) # Yes or No
+    # Many of: convetional, organic EU, organic demeter, transitioning, regen, market gardening, vegan, other
+    farm_type = models.JSONField()
+    # Many of: Agroforestry, Aquaculture, Beekeeping, etc
+    production_methods = models.JSONField()
+    # Many of: Meat, Fruits, Herbs, etc
+    main_products = models.JSONField()  
+    # Many of Sandy, Silty, etc.
+    soil = models.JSONField()  
+    # one of conventional, reduced, vertical, no-till
+    tillage = models.JSONField()  
+    # many of: synthetic, organinc, cover crops, no other
+    fertilization = models.JSONField()
+    irrigation = models.JSONField()  # Many of: Surface, floos, sprinkler, etc.
+    # Yes or No to Pesticides, Herbicides, Fungicides, etc.
+    uses_icides = models.BooleanField(null=True)
+    receives_funding = models.BooleanField(null=True)  # Yes or No
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['created']
+
 
 class ProfileMedia(models.Model):
     # pictures =
@@ -46,20 +54,26 @@ class Organization(models.Model):
 
 
 class Farm(Organization):
-    # Farm specific information: 
+    # Farm specific information:
     farm_size_approx = models.IntegerField(null=True)
     date_joined = models.DateField(auto_now_add=True)
     public_profile = models.BooleanField(default=False)
-    # Relations: 
+    # Relations:
     survey_answers = models.OneToOneField(
         SurveyAnswers,
         on_delete=models.CASCADE,
         null=True
-        )
+    )
+    organization = models.OneToOneField(
+        to=Organization, 
+        parent_link=True, 
+        on_delete=models.CASCADE
+    )
 
 
 class Consultancy(Organization):
     pass
+
 
 class Role(models.Model):
     class RoleChoices(models.IntegerChoices):
@@ -67,6 +81,7 @@ class Role(models.Model):
         CONSULTANT = 2
         # TODO: Handle other
     role = models.IntegerField(choices=RoleChoices.choices)
+
 
 class Person(models.Model):
     # Basic information
@@ -79,26 +94,28 @@ class Person(models.Model):
     comm_pref = models.ForeignKey(
         CommunicationPreferences,
         on_delete=models.PROTECT,
-        ) # One of: phone, email, whatsapp, other
+    )  # One of: phone, email, whatsapp, other
 
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['created']
 
+
 class PersonToRoleToOrg(models.Model):
     person = models.ForeignKey(
         Person,
         on_delete=models.PROTECT
-        )
+    )
     role = models.ForeignKey(
         Role,
         on_delete=models.PROTECT
-        ) 
+    )
     organization = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT
-        )
+    )
+
 
 class Field(models.Model):
     field_name = models.CharField(max_length=32)
