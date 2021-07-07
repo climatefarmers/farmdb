@@ -27,4 +27,8 @@ services:
       - db
     env_file:
       - .env
-
+  address:
+    image: climatefarmers/address_parser:latest
+    build: 
+      context: src/address_parser
+    
