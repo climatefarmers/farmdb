@@ -80,9 +80,13 @@ question_index = {
 def determine_answer_content(answer):
     answer_type = answer['type']
     if answer_type == 'choices':
-        return answer[answer_type]['labels']
+        main = answer[answer_type].get('labels')
+        other = answer[answer_type].get('other')
+        main = main if main is not None else []
+        other = [other] if other is not None else []
+        return main + other
     elif answer_type == 'choice':
-        return answer[answer_type]['label']
+        return answer[answer_type].get('label', '') + answer[answer_type].get('other', '')       
     return answer[answer_type]
 
 
@@ -94,7 +98,7 @@ def split_name(full_name):
 def split_street(street):
     splits = re.split(r'(?<=\d)(?:-\d+)?\s+', street)
     if len(splits) == 1:
-        return MISSING_STREET_NR, splits[0]
+        return [MISSING_STREET_NR, splits[0]]
     return splits
 
 
