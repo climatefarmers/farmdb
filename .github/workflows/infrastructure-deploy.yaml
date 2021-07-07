@@ -1,0 +1,81 @@
+name: infrastructure-deploy
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+    paths:
+    - 'infrastructure/**'
+    - '.github/workflows/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+    - 'infrastructure/**'
+    - '.github/workflows/**'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  setup_k8s:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infrastructure
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+          
+      # Downloads a specific version of Terraform CLI and adds it to PATH
+      # Marketplace: https://github.com/marketplace/actions/hashicorp-setup-terraform
+      - name: "Setup - Terraform CLI"
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+        
+      - name: "Run - Terraform Init"
+        run: terraform init -input=false -backend-config="access_key=${{ secrets.TFSTATE_BUCKET_ACCESS_KEY }}" -backend-config="secret_key=${{ secrets.TFSTATE_BUCKET_SECRET_KEY }}"
+
+      # Note: Color is disabled to prevent messy characters from appearing in the pull request comment
+      - name: "Run - Terraform Plan"
+        id: plan
+        run: |
+          export TF_VAR_token=${{ secrets.GCP_TOKEN }}
+          terraform plan -var-file="terraform.tfvars" -input=false -no-color 
+        continue-on-error: true
+        
+      # Add comment with outputs if this was a PR
+      - uses: actions/github-script@0.9.0
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖${{ steps.validate.outputs.stdout }}
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            <details><summary>Show Plan</summary>
+            \`\`\`${process.env.PLAN}\`\`\`
+            </details>
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+          
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          export TF_VAR_token=${{ secrets.GCP_TOKEN }}
+          terraform apply -auto-approve
