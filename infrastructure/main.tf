@@ -2,7 +2,6 @@ terraform {
   backend "s3" {
      bucket = "farmdb-tfstate"
      key = "farmdb.tfstate"
-     region = "europe-west3"
      endpoint = "https://storage.googleapis.com"
      skip_credentials_validation = true
   }
