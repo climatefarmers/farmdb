@@ -1,7 +1,11 @@
+import os
 import logging
-import re
+import requests
+
 
 logger = logging.getLogger(__name__)
+
+ADDRESS_SERVICE_ENDPOINT = os.getenv('ADDRESS_SERVICE_ENDPOINT')
 
 """ Example json data:
 
@@ -96,11 +100,12 @@ def split_name(full_name):
 
 
 def split_street(street):
-    splits = re.split(r'(?<=\d)(?:-\d+)?\s+', street)
-    if len(splits) == 1:
-        return [MISSING_STREET_NR, splits[0]]
-    return splits
-
+    escaped_street = street.replace(' ', '%20')
+    r = requests.get(ADDRESS_SERVICE_ENDPOINT + f'?address={escaped_street}')
+    data = r.json()
+    nr = data['house_number'] if data['house_number'] is not None else ''
+    route = data['road'] if data['road'] is not None else ''
+    return nr, route
 
 def lookup_comm_pref(comm_pref):
     options = {
@@ -141,6 +146,7 @@ def flatten_survey(survey_body: dict) -> dict:
         if field_name == 'full_name':
             flattened['first_name'], flattened['last_name'] = split_name(answer_content)
         elif field_name == 'street':
+            flattened['street_raw'] = answer_content
             flattened['street_number'], flattened['route'] = split_street(answer_content)
         elif field_name == 'comm_pref':
             flattened[field_name] = lookup_comm_pref(answer_content)
@@ -154,11 +160,10 @@ def flatten_survey(survey_body: dict) -> dict:
 
 def parse_address(**kwargs):
     return {
-        'street_number': kwargs.get('street_number'),
+        'street_number': kwargs.get('street_number',''),
         'route': kwargs.get('route', ''),
-        'raw': ' '.join([str(e) for e in [
-            kwargs.get('route', ''),
-            kwargs.get('street_number', ''),
+        'raw': '; '.join([str(e) for e in [
+            kwargs.get('street_raw', ''),
             kwargs.get('city', ''),
             kwargs.get('country', ''),
         ]]),
