@@ -136,10 +136,13 @@ class PersonToRoleToOrgSerializer(serializers.ModelSerializer):
 
         role, _ = Role.objects.get_or_create(**validated_data['role'])  # 1 for Farmer
 
-        person_to_role_to_org = PersonToRoleToOrg.objects.create(
+        person_to_role_to_org, created = PersonToRoleToOrg.objects.get_or_create(
             person=person,
             role=role,
             organization=farm
         )
 
+        if created:
+            return person_to_role_to_org
+        person_to_role_to_org.organization = farm
         return person_to_role_to_org
