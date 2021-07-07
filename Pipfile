@@ -11,6 +11,7 @@ djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
 pytest = "*"
+requests = "*"
 
 [dev-packages]
 
