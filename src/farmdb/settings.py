@@ -68,6 +68,8 @@ REST_FRAMEWORK = {
 
 ROOT_URLCONF = 'farmdb.urls'
 
+FARMDB_CORE_TYPEFORM_SECRET = os.getenv('TYPEFORM_SECRET')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
