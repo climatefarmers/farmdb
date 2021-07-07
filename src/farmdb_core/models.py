@@ -44,8 +44,8 @@ class CommunicationPreferences(models.Model):
 
 class Organization(models.Model):
     name = models.CharField(max_length=64)
-    description = models.TextField(max_length=2048)
-    website = models.URLField()
+    description = models.TextField(max_length=2048, null=True)
+    website = models.URLField(null=True)
     address = AddressField(on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(auto_now_add=True)
 
