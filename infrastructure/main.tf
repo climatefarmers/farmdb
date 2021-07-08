@@ -1,9 +1,7 @@
 terraform {
-  backend "s3" {
+  backend "gcs" {
      bucket = "farmdb-tfstate"
-     key = "farmdb.tfstate"
-     endpoint = "https://storage.googleapis.com"
-     skip_credentials_validation = true
+     prefix = "terraform/farmdb"
   }
 }
 
