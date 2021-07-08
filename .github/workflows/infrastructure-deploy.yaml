@@ -38,7 +38,7 @@ jobs:
         
       - name: "Run - Terraform Init"
         run: |
-          echo ${{ secrets.TFSTATE_GOOGLE_APPLICATION_CREDENTIALS }} > credentials.json
+          echo '${{ secrets.TFSTATE_GOOGLE_APPLICATION_CREDENTIALS }}' > credentials.json
           terraform init -input=false
         env: 
           GOOGLE_APPLICATION_CREDENTIALS: credentials.json
