@@ -37,9 +37,11 @@ jobs:
           terraform_wrapper: false
         
       - name: "Run - Terraform Init"
-        run: terraform init -input=false
+        run: |
+          echo ${{ secrets.TFSTATE_GOOGLE_APPLICATION_CREDENTIALS }} > credentials.json
+          terraform init -input=false
         env: 
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.TFSTATE_GOOGLE_APPLICATION_CREDENTIALS }}
+          GOOGLE_APPLICATION_CREDENTIALS: credentials.json
 
       # Note: Color is disabled to prevent messy characters from appearing in the pull request comment
       - name: "Run - Terraform Plan"
