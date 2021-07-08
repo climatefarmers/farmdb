@@ -39,7 +39,7 @@ jobs:
       - name: "Run - Terraform Init"
         run: terraform init -input=false
         env: 
-          GOOGLE_APPLICATION_CREDENTIALS: ${{TFSTATE_GOOGLE_APPLICATION_CREDENTIALS}}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.TFSTATE_GOOGLE_APPLICATION_CREDENTIALS }}
 
       # Note: Color is disabled to prevent messy characters from appearing in the pull request comment
       - name: "Run - Terraform Plan"
