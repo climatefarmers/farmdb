@@ -12,6 +12,30 @@ provider "google" {
 }
 
 
+resource "google_compute_network" "custom" {
+  name                    = "${var.resource_group}-vpc-${var.env}"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "custom" {
+  name          = "${var.resource_group}-subnet-${var.env}"
+  ip_cidr_range = "10.5.0.0/20"
+  region        = var.gcp_region
+  network       = google_compute_network.custom.id
+  secondary_ip_range {
+    range_name    = "services-ip-range"
+    ip_cidr_range = "10.4.0.0/19"
+  }
+
+  secondary_ip_range {
+    range_name    = "pods-ip-range"
+    ip_cidr_range = "10.0.0.0/14"
+  }
+}
+
+
+
+
 resource "google_sql_database_instance" "farmdb-postgres" {
   name             = "${var.resource_group}-${var.postgres_db_name}-${var.env}"
   database_version = var.postgres_version
@@ -39,6 +63,19 @@ resource "google_container_cluster" "primary" {
   # node pool and immediately delete it.
   remove_default_node_pool = true
   initial_node_count       = 1
+
+  network    = google_compute_network.custom.id
+  subnetwork = google_compute_subnetwork.custom.id
+
+  ip_allocation_policy {
+    cluster_secondary_range_name  = "pods-ip-range"
+    services_secondary_range_name = "services-ip-range"
+  }
+
+  #private_cluster_config {
+  #  enable_private_nodes = true
+  #  master_ipv4_cidr_block = "127.16.0.0/28"
+  #}
 }
 
 resource "google_container_node_pool" "primary_preemptible_nodes" {
@@ -57,4 +94,14 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
       "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
+}
+
+data "google_client_config" "provider" {}
+
+provider "kubernetes" {
+  host  = "https://${google_container_cluster.primary.endpoint}"
+  token = data.google_client_config.provider.access_token
+  cluster_ca_certificate = base64decode(
+    google_container_cluster.primary.master_auth[0].cluster_ca_certificate,
+  )
 }
