@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: farmdb-django-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: farmdb-django-deployment
+  template:
+    metadata:
+      labels:
+        app: farmdb-django-deployment
+    spec:
+      containers:
+      - name: farmdb-django
+        image: climatefarmers/farmdb-django
+        command: ['python ']
+        args: ['manage.py', 'runserver', '0.0.0.0:8080']
+        imagePullPolicy: Always
+        env:
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: pguser
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: pgpass
+        - name: PGNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: pgname
+        - name: PGHOST
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: pghost
+        - name: PGPORT
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: pgport
+        - name: DJANGO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: django_secret_key
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: google_api_key
+        - name: TYPEFORM_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: typeform_secret
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        
