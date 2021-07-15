@@ -13,7 +13,7 @@ variable "gcp_region" {
     default = "europe-west3"
 }
 
-variable "gcs_project_id" {
+variable "gcp_project_id" {
     description = "The GCS project to use"
 }
 
