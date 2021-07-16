@@ -12,6 +12,16 @@ provider "google" {
 }
 
 
+resource "random_password" "postgres_password" {
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
+###################################################################################################
+# Networking
+###################################################################################################
+
 resource "google_compute_network" "custom" {
   name                    = "${var.resource_group}-vpc-${var.env}"
   auto_create_subnetworks = false
@@ -33,10 +43,11 @@ resource "google_compute_subnetwork" "custom" {
   }
 }
 
+###################################################################################################
+# Cloud SQL and DB
+###################################################################################################
 
-
-
-resource "google_sql_database_instance" "farmdb-postgres" {
+resource "google_sql_database_instance" "primary" {
   name             = "${var.resource_group}-${var.postgres_db_name}-${var.env}"
   database_version = var.postgres_version
   region           = var.gcp_region
@@ -45,18 +56,37 @@ resource "google_sql_database_instance" "farmdb-postgres" {
     # Second-generation instance tiers are based on the machine
     # type. See argument reference below.
     tier = var.postgres_host_tier
+
+    ip_configuration {
+      ipv4_enabled = false
+      private_network = google_compute_network.custom.self_link
+    }
   }
 }
 
+resource "google_sql_database" "farmdb" {
+  name     = "farmdb"
+  instance = google_sql_database_instance.primary.name
+}
 
-resource "google_service_account" "default" {
-  account_id   = "service-account-id"
-  display_name = "Service Account"
+
+resource "google_sql_user" "db_user" {
+  name     = var.postgres_user
+  instance = google_sql_database_instance.primary.name
+  password = random_password.postgres_password.result
+}
+
+###################################################################################################
+# GKE and nodepool
+###################################################################################################
+
+resource "google_service_account" "gke" {
+  account_id   = "${var.resource_group}-gke-serviceaccount"
 }
 
 resource "google_container_cluster" "primary" {
   name     = "${var.resource_group}-${var.kubernetes_cluster_name}-${var.env}"
-  location = var.gcp_region
+  location = "${var.gcp_region}-a" #Zonal cluster instead of regional with replicas in 3 zones 
 
   # We can't create a cluster with no node pool defined, but we want to only use
   # separately managed node pools. So we create the smallest possible default
@@ -76,11 +106,15 @@ resource "google_container_cluster" "primary" {
   #  enable_private_nodes = true
   #  master_ipv4_cidr_block = "127.16.0.0/28"
   #}
+
+  workload_identity_config {
+    identity_namespace = "${var.gcp_project_id}.svc.id.goog"
+  }
 }
 
 resource "google_container_node_pool" "primary_preemptible_nodes" {
   name       = "${var.resource_group}-${var.kubernetes_cluster_name}-nodepool-${var.env}"
-  location   = var.gcp_region
+  location   = "${var.gcp_region}-a" #Zonal cluster instead of regional with replicas in 3 zones 
   cluster    = google_container_cluster.primary.name
   node_count = var.node_count
 
@@ -89,12 +123,18 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
     machine_type = var.node_tier
 
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-    service_account = google_service_account.default.email
+    service_account = google_service_account.gke.email
     oauth_scopes    = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
 }
+
+
+###################################################################################################
+# K8s setup
+###################################################################################################
+
 
 data "google_client_config" "provider" {}
 
@@ -104,4 +144,43 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(
     google_container_cluster.primary.master_auth[0].cluster_ca_certificate,
   )
+}
+
+
+resource "kubernetes_namespace" "farmdb" {
+  metadata {
+    annotations = {
+      name = "farmdb-namespace"
+    }
+
+    name = "farmdb"
+  }
+}
+
+resource "kubernetes_secret" "postgres-secret" {
+  metadata {
+    name = "postgres-secret"
+    namespace = kubernetes_namespace.farmdb.metadata.0.name
+  }
+
+  data = {
+    username = var.postgres_user
+    password = random_password.postgres_password.result
+    database = google_sql_database.farmdb.name
+  }
+
+  type = "kubernetes.io/basic-auth"
+}
+
+
+###################################################################################################
+# Cloud SQL proxy GSA-KSA binding through workload identity
+###################################################################################################
+
+module "my-app-workload-identity" {
+  source     = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
+  name       = "${var.resource_group}-sql-proxy-${var.env}"
+  namespace  = kubernetes_namespace.farmdb.metadata.0.name
+  project_id = var.gcp_project_id
+  roles = ["roles/cloudsql.admin"]
 }
