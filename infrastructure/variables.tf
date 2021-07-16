@@ -20,7 +20,7 @@ variable "gcp_project_id" {
 # Postgres Variables
 variable "postgres_db_name" {
     description = "Name for the postgres db"
-    default = "farmdb"
+    default = "pgfarmdb"
 }
 
 variable "postgres_version" {
@@ -31,6 +31,11 @@ variable "postgres_version" {
 variable "postgres_host_tier" {
     description = "The tier of the machine to host postgres"
     default = "db-f1-micro"
+}
+
+variable "postgres_user" {
+    description = "The username for the main pg account"
+    default = "cfadmin"
 }
 
 # Kubernetes Variables
