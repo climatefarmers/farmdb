@@ -13,37 +13,40 @@ spec:
         app: farmdb-django-deployment
     spec:
       containers:
+      - name: cloud-sql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.17
+        command:
+          - "/cloud_sql_proxy"
+          - "-ip_address_types=PRIVATE"
+          - "-instances=idyllic-silicon-318213:europe-west3:cfcommon-pgfarmdb-dev=tcp:5432"
+        securityContext:
+          runAsNonRoot: true
+
       - name: farmdb-django
         image: climatefarmers/farmdb-django
         command: ['python ']
-        args: ['manage.py', 'runserver', '0.0.0.0:8080']
+        args: ['manage.py', 'runserver', '0.0.0.0:8000']
         imagePullPolicy: Always
         env:
         - name: PGUSER
           valueFrom:
             secretKeyRef:
               name: postgres-secret
-              key: pguser
+              key: username
         - name: PGPASS
           valueFrom:
             secretKeyRef:
               name: postgres-secret
-              key: pgpass
+              key: password
         - name: PGNAME
           valueFrom:
             secretKeyRef:
               name: postgres-secret
-              key: pgname
+              key: database
         - name: PGHOST
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: pghost
+          value: "127.0.0.1"
         - name: PGPORT
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: pgport
+          value: 5432"
         - name: DJANGO_SECRET_KEY
           valueFrom:
             secretKeyRef:
@@ -61,6 +64,6 @@ spec:
               key: typeform_secret
         ports:
         - name: http
-          containerPort: 8080
+          containerPort: 8000
           protocol: TCP
         
