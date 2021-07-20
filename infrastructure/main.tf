@@ -184,3 +184,14 @@ module "my-app-workload-identity" {
   project_id = var.gcp_project_id
   roles = ["roles/cloudsql.admin"]
 }
+
+###################################################################################################
+# ArgoCD
+###################################################################################################
+
+module "argo_cd" {
+  source = "runoncloud/argocd/kubernetes"
+
+  namespace       = "argocd"
+  argo_cd_version = "2.0.3"
+}
