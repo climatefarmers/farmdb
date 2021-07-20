@@ -29,4 +29,4 @@ COPY ./main.py /code/
 RUN python -m compileall .
 
 ENTRYPOINT ["uvicorn"]
-CMD ["main:app", "--host", "0.0.0.0"]
+CMD ["main:app", "--host", "0.0.0.0", "--port", "8080"]

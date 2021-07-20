@@ -1,22 +1,5 @@
 name: infrastructure-deploy
 
-# Controls when the action will run. 
-on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
-    paths:
-    - 'infrastructure/**'
-    - '.github/workflows/**'
-  pull_request:
-    branches: [ main ]
-    paths:
-    - 'infrastructure/**'
-    - '.github/workflows/**'
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   infrastructure-deploy:
@@ -37,7 +20,11 @@ jobs:
           terraform_wrapper: false
         
       - name: "Run - Terraform Init"
-        run: terraform init -input=false -backend-config="access_key=${{ secrets.TFSTATE_BUCKET_ACCESS_KEY }}" -backend-config="secret_key=${{ secrets.TFSTATE_BUCKET_SECRET_KEY }}"
+        run: |
+          echo '${{ secrets.TFSTATE_GOOGLE_APPLICATION_CREDENTIALS }}' > credentials.json
+          terraform init -input=false
+        env: 
+          GOOGLE_APPLICATION_CREDENTIALS: credentials.json
 
       # Note: Color is disabled to prevent messy characters from appearing in the pull request comment
       - name: "Run - Terraform Plan"

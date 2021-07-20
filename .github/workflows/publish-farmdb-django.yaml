@@ -1,0 +1,48 @@
+name: Farmdb build and publish
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+on:
+  schedule:
+    - cron: '00 03 * * *'
+  push:
+    branches: [ main ]
+    paths:
+      - farmdb-django/**
+  pull_request:
+    branches: [ main ]
+    paths:
+      - farmdb-django/**
+
+env:
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: climatefarmers/farmdb-django
+  PATH: ./farmdb-django
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.PATH }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1 # Info: https://github.com/docker/build-push-action/tree/releases/v1#tags
+        with:
+          username: climatefarmers
+          password: ${{ secrets.TOKEN_HUB }}
+          repository: ${{ env.IMAGE_NAME }}
+          tag_with_ref: true # Info: https://github.com/docker/build-push-action/tree/releases/v1#tag_with_ref
+          tag_with_sha: true # Info: https://github.com/docker/build-push-action/tree/releases/v1#tag_with_sha
+          tags: latest
