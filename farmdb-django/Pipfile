@@ -12,8 +12,11 @@ markdown = "*"
 django-filter = "*"
 pytest = "*"
 requests = "*"
+pytz = "*"
 
 [dev-packages]
+pylint = "*"
+pylint-django = "*"
 
 [requires]
 python_version = "3.8"

@@ -6,18 +6,18 @@ from address.models import AddressField
 
 class SurveyAnswers(models.Model):
     # Many of: convetional, organic EU, organic demeter, transitioning, regen, market gardening, vegan, other
-    farm_type = models.JSONField()
+    farm_type = models.JSONField(null=True)
     # Many of: Agroforestry, Aquaculture, Beekeeping, etc
-    production_methods = models.JSONField()
+    production_methods = models.JSONField(null=True)
     # Many of: Meat, Fruits, Herbs, etc
-    main_products = models.JSONField()  
+    main_products = models.JSONField(null=True)  
     # Many of Sandy, Silty, etc.
-    soil = models.JSONField()  
+    soil = models.JSONField(null=True)  
     # one of conventional, reduced, vertical, no-till
-    tillage = models.JSONField()  
+    tillage = models.JSONField(null=True)  
     # many of: synthetic, organinc, cover crops, no other
-    fertilization = models.JSONField()
-    irrigation = models.JSONField()  # Many of: Surface, floos, sprinkler, etc.
+    fertilization = models.JSONField(null=True)
+    irrigation = models.JSONField(null=True)  # Many of: Surface, floos, sprinkler, etc.
     # Yes or No to Pesticides, Herbicides, Fungicides, etc.
     uses_icides = models.BooleanField(null=True)
     receives_funding = models.BooleanField(null=True)  # Yes or No
@@ -25,6 +25,9 @@ class SurveyAnswers(models.Model):
 
     class Meta:
         ordering = ['created']
+
+    def __str__(self) -> str:
+        return f"{self.created}"
 
 
 class ProfileMedia(models.Model):
@@ -71,6 +74,9 @@ class Farm(Organization):
         on_delete=models.CASCADE
     )
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Consultancy(Organization):
     pass
@@ -102,6 +108,9 @@ class Person(models.Model):
     class Meta:
         ordering = ['created']
 
+    def __str__(self) -> str:
+        return f"{self.last_name}, {self.first_name}"
+
 
 class PersonToRoleToOrg(models.Model):
     person = models.ForeignKey(
@@ -123,6 +132,8 @@ class Field(models.Model):
     geom = gismodels.PolygonField(srid=4326)
     farm = models.ForeignKey('Farm', on_delete=models.PROTECT)
 
+    def __str__(self) -> str:
+        return f"{self.field_name}"
 
 class Crop(models.Model):
     pass
