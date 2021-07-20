@@ -62,7 +62,8 @@ class Farm(Organization):
     survey_answers = models.OneToOneField(
         SurveyAnswers,
         on_delete=models.CASCADE,
-        null=True
+        null=True,
+        blank=True
     )
     organization = models.OneToOneField(
         to=Organization, 
