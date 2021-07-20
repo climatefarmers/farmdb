@@ -18,11 +18,11 @@ from django.urls import path, include
 from django.http import HttpResponse
 
 
-def liveness(request):
-    return HttpResponse(status=204)
+def health(request):
+    return HttpResponse(status=200)
 
 urlpatterns = [
-    path('/', liveness),
+    path('health/', health),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', include('farmdb_core.urls'))
