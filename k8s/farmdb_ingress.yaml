@@ -5,6 +5,8 @@ metadata:
   annotations:
     cloud.google.com/load-balancer-type: "External"
     kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "false"
+
 spec:
   rules:
   - http:
