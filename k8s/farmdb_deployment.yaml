@@ -81,7 +81,7 @@ spec:
           value: "/etc/credentials.json"
         volumeMounts:
         - name: static-secret
-          mountPath: "/etc/credentials.json"
+          mountPath: "/etc/"
       
         ports:
         - name: http
