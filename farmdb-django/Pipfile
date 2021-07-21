@@ -13,6 +13,7 @@ django-filter = "*"
 pytest = "*"
 requests = "*"
 pytz = "*"
+django-storages = {extras = ["google"], version = "*"}
 
 [dev-packages]
 pylint = "*"
