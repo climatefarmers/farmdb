@@ -78,10 +78,10 @@ spec:
         - name: STATIC_BUCKET
           value: cfcommon-static-dev
         - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: "/etc/credentials.json"
+          value: "/etc/static/credentials.json"
         volumeMounts:
         - name: static-secret
-          mountPath: "/etc/"
+          mountPath: "/etc/static"
       
         ports:
         - name: http
