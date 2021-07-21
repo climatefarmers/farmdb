@@ -204,3 +204,46 @@ module "argo_cd" {
   namespace       = "argocd"
   argo_cd_version = "2.0.3"
 }
+
+###################################################################################################
+# Static file bucket
+###################################################################################################
+resource "google_storage_bucket" "static" {
+  name          = "${var.resource_group}-static-${var.env}"
+  location      = "EU"
+  force_destroy = true
+
+  uniform_bucket_level_access = true
+}
+
+resource "google_service_account" "static" {
+  account_id   = "${var.resource_group}-static-gsa-${var.env}"
+}
+
+resource "google_service_account_key" "static" {
+  service_account_id = google_service_account.static.name
+}
+
+resource "kubernetes_secret" "static" {
+  metadata {
+    name = "static-gsa-credentials"
+    namespace = kubernetes_namespace.farmdb.metadata.0.name
+  }
+  data = {
+    "credentials.json" = base64decode(google_service_account_key.static.private_key)
+  }
+}
+
+data "google_iam_policy" "static" {
+  binding {
+    role = "roles/storage.admin"
+    members = [
+      "serviceAccount:${google_service_account.static.email}",
+    ]
+  }
+}
+
+resource "google_storage_bucket_iam_policy" "static" {
+  bucket = google_storage_bucket.static.name
+  policy_data = data.google_iam_policy.static.policy_data
+}
