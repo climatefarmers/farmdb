@@ -73,6 +73,8 @@ spec:
             secretKeyRef:
               name: django-secret
               key: typeform_secret
+        - name: ADDRESS_SERVICE_ENDPOINT
+          value: http://localhost:8080/parse/
         ports:
         - name: http
           containerPort: 8000
