@@ -11,7 +11,8 @@ metadata:
 
 spec:
   rules:
-  - http:
+  - host: farmdb-dev.climatefarmers.org
+    http:
       paths:
       - path: /*
         pathType: Prefix
