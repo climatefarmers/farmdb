@@ -14,21 +14,22 @@ services:
     env_file:
       - .env
   web:
-    image: climatefarmers/farmdb:latest
+    image: climatefarmers/farmdb-django:latest
     build: 
-        context: .
+        context: ./farmdb-django
         dockerfile: ./farmdb.Dockerfile
-    command: sh entrypoint.sh
+    entrypoint: ["sh"]
+    command: ["entrypoint.sh"]
+    volumes:
+      - ./farmdb-django/:/code/
     ports:
       - "8000:8000"
-    volumes:
-      - ./src:/code
     depends_on:
       - db
     env_file:
       - .env
   address:
-    image: climatefarmers/address_parser:latest
+    image: climatefarmers/address-parser:latest
     build: 
-      context: src/address_parser
+      context: ./address_parser
     
