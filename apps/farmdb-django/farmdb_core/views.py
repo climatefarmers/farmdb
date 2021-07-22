@@ -27,7 +27,7 @@ class TypeFormFarmerSurvey(APIView):
     def post(self, request, format=None):
         if valid_typeform_signature(request):
             parsed_data = parse_survey(request.data)
-            #TODO: try/except to debug db
+            #TODO: try/except to store request body and stacktrace to debug db table
             serializer = PersonToRoleToOrgSerializer(data=parsed_data)
             if serializer.is_valid():
                 serializer.save()
