@@ -17,6 +17,9 @@ env:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
+    defaults:
+      run: 
+        working-directory: ${{ env.CONTEXT }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -40,7 +43,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           repository: ${{ env.IMAGE_NAME }}
-          context: ${{ env.CONTEXT }}
           file: ${{ env.DOCKERFILE }}
           tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           push: true
