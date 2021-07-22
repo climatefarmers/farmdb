@@ -60,8 +60,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-data/
-migrations/
+
 
 # Flask stuff:
 instance/
@@ -167,3 +166,9 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+
+# Ignore local dev files
+data/
+migrations/
+docker-compose.yml
