@@ -1,6 +1,6 @@
 FROM python:slim-buster
 ENV PYTHONUNBUFFERED=1
-RUN apt update && apt upgrade
+RUN apt update && apt upgrade -y
 RUN apt install -y binutils libproj-dev gdal-bin
 WORKDIR /code
 COPY ./Pipfile.lock /code
