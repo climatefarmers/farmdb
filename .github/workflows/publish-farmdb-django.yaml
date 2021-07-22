@@ -1,32 +1,46 @@
 name: Farmdb build and publish
 
-env:
-  IMAGE_NAME: climatefarmers/farmdb-django
-  PATH: ./apps/farmdb-django
-
 on:
   schedule:
     - cron: '00 03 * * *'
   push:
     branches: [ main ]
     paths:
-      - ${{ env.PATH }}/**
+      - apps/farmdb-django/**
       - .github/workflows/publish-farmdb-django.yaml
 
+env:
+  IMAGE_NAME: climatefarmers/farmdb-django
+  DOCKERFILE: farmdb.Dockerfile
+  PATH: ./apps/farmdb-django
+
 jobs:
-  build:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: climatefarmers
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           repository: ${{ env.IMAGE_NAME }}
           context: ${{ env.PATH }}
-          file: farmdb.Dockerfile
-          tags: latest
+          file: ${{ env.DOCKERFILE }}
+          tags: ${{ steps.meta.outputs.tags }}
+          push: true
