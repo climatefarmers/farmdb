@@ -22,6 +22,7 @@ services:
     command: ["entrypoint.sh"]
     volumes:
       - ./farmdb-django/:/code/
+      - /home/tim/Documents/ClimateFarmers/static-gsa-cred.json:/etc/static/credential.json
     ports:
       - "8000:8000"
     depends_on:
