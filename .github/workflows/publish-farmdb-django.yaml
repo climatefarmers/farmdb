@@ -12,6 +12,7 @@ on:
     branches: [ main ]
     paths:
       - apps/farmdb-django/**
+      - .github/workflows/publish-farmdb-django.yaml
 
 env:
   # github.repository as <account>/<repo>
