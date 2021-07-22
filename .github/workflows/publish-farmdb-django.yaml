@@ -1,9 +1,8 @@
 name: Farmdb build and publish
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+env:
+  IMAGE_NAME: climatefarmers/farmdb-django
+  PATH: ./apps/farmdb-django
 
 on:
   schedule:
@@ -11,13 +10,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - apps/farmdb-django/**
+      - ${{ env.PATH }}/**
       - .github/workflows/publish-farmdb-django.yaml
-
-env:
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: climatefarmers/farmdb-django
-  PATH: ./apps/farmdb-django
 
 jobs:
   build:
