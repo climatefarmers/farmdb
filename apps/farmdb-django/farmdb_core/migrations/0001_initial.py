@@ -10,10 +10,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('address', '0004_auto_20210723_0932'),
-    ]
-
     operations = [
         migrations.CreateModel(
             name='CommunicationPreferences',
