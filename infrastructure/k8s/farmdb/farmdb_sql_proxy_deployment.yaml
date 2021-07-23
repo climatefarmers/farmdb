@@ -40,4 +40,7 @@ spec:
             secretKeyRef:
               name: postgres-secret
               key: connection_name
-        
+        ports:
+        - name: http
+          containerPort: 5432
+          protocol: TCP
