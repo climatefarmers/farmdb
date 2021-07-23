@@ -55,7 +55,10 @@ spec:
               name: postgres-secret
               key: database
         - name: PGHOST
-          value: "10.31.128.5"
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: private_ip
         - name: PGPORT
           value: "5432"
         - name: DJANGO_SECRET_KEY
@@ -95,42 +98,3 @@ spec:
       - name: static-secret
         secret:
           secretName: static-gsa-credentials
-      
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: farmdb-sql-proxy
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: farmdb-sql-proxy
-  template:
-    metadata:
-      labels:
-        app: farmdb-sql-proxy
-    spec:
-      serviceAccountName: cfcommon-sql-proxy-dev
-      containers:
-      - name: farmdb-sql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.11
-        command: 
-          - "/cloud_sql_proxy" 
-          - "-instances=idyllic-silicon-318213:europe-west3:cfcommon-pgfarmdb-dev=tcp:5432"
-        env:
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: username
-        - name: DB_PASS
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: password
-        - name: DB_NAME
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: database
