@@ -170,5 +170,4 @@ terraform.rc
 
 # Ignore local dev files
 data/
-migrations/
 docker-compose.yml
