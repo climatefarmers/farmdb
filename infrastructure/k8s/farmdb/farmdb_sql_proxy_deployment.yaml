@@ -18,7 +18,7 @@ spec:
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
         command: 
           - "/cloud_sql_proxy" 
-          - "-instances=$CONNECTION_NAME=tcp:5432"
+          - "-instances=idyllic-silicon-318213:europe-west3:cfcommon-pgfarmdb-dev=tcp:5432"
         env:
         - name: DB_USER
           valueFrom:
