@@ -167,6 +167,9 @@ resource "kubernetes_secret" "postgres-secret" {
     username = var.postgres_user
     password = random_password.postgres_password.result
     database = google_sql_database.farmdb.name
+    instance = google_sql_database.farmdb.instance
+    private_ip = google_sql_database_instance.primary.ip_address.0.ip_address
+    connection_name = google_sql_database_instance.primary.connection_name
   }
 
   type = "kubernetes.io/basic-auth"
