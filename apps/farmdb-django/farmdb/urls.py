@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import HttpResponse
 
-
+# This is a nice addition 
+# https://github.com/KristianOellegaard/django-health-check
 def health(request):
     return HttpResponse(status=200)
 

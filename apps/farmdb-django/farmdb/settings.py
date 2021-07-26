@@ -26,6 +26,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', False)
 
+# How does this resolve with the Google load balancer? * Is not ideal here
 ALLOWED_HOSTS = ['*']
 
 
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Should we really allow read only to unauth users?
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -131,6 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
+# Are the google servers on UTC
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
@@ -145,6 +148,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+#Why are you only doing this in Prod?
 if not DEBUG:
     DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
     STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'

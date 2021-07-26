@@ -5,6 +5,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+# This should probably be in settings
 ADDRESS_SERVICE_ENDPOINT = os.getenv('ADDRESS_SERVICE_ENDPOINT')
 
 """ Example json data:
@@ -98,7 +99,7 @@ def split_name(full_name):
     name_parts = full_name.split(' ')
     return ' '.join(name_parts[:-1]), name_parts[-1]
 
-
+# What happens if the request fails
 def split_street(street):
     escaped_street = street.replace(' ', '%20')
     r = requests.get(ADDRESS_SERVICE_ENDPOINT + f'?address={escaped_street}')
