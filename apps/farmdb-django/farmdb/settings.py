@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'rest_framework',
+    'rest_framework_gis',
     'rest_framework.authtoken',
     'address',
     'farmdb_core.apps.FarmdbCoreConfig',
@@ -62,6 +63,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES':[
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication'
     ]
 }
