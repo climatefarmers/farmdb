@@ -47,9 +47,9 @@ class CommunicationPreferences(models.Model):
 
 class Organization(models.Model):
     name = models.CharField(max_length=64)
-    description = models.TextField(max_length=2048, null=True)
-    website = models.URLField(null=True)
-    address = AddressField(on_delete=models.CASCADE, null=True)
+    description = models.TextField(max_length=2048, null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
+    address = AddressField(on_delete=models.CASCADE, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -58,7 +58,7 @@ class Organization(models.Model):
 
 class Farm(Organization):
     # Farm specific information:
-    farm_size_approx = models.IntegerField(null=True)
+    farm_size_approx = models.IntegerField(null=True, blank=True)
     date_joined = models.DateField(auto_now_add=True)
     public_profile = models.BooleanField(default=False)
     # Relations:
