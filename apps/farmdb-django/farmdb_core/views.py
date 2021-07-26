@@ -10,6 +10,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from rest_framework import authentication, permissions, status
+from django.contrib.gis.db.models.functions import Centroid, AsGeoJSON
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views import generic
@@ -35,10 +36,27 @@ class FarmDetail(generic.DetailView):
         """Return the view context data."""
         context = super().get_context_data(**kwargs)
         farm_fields = Field.objects.filter(farm=context['farm'])
-        context["fields"] = json.loads(serialize("geojson", farm_fields))
+        context["geojson"] = json.loads(serialize("geojson", farm_fields))
         print(context)
         return context
 
+class FieldDetail(generic.DetailView):
+    template_name = "field_detail.html"
+    model = Field
+
+    def get_context_data(self, **kwargs):
+        """Return the view context data."""
+        context = super().get_context_data(**kwargs)
+        context["geojson"] = json.loads(serialize("geojson", [context['field']]))
+
+        centroid = context['field'].geom.centroid
+
+        context["specs"] = {
+            "latitude" : centroid.y,
+            "longitude" : centroid.x,
+            "area" : round(context['field'].geom.transform('EPSG:3035', clone=True).area / 10000, 2)
+        }
+        return context
 
 class FieldsMapView(TemplateView):
     """Fields map view."""
