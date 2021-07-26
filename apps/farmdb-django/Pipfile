@@ -18,6 +18,7 @@ django-storages = {extras = ["google"], version = "*"}
 [dev-packages]
 pylint = "*"
 pylint-django = "*"
+isort = "*"
 
 [requires]
 python_version = "3.8"
