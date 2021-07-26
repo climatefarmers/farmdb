@@ -82,7 +82,7 @@ class FarmSerializer(serializers.ModelSerializer):
     class Meta:
         model = Farm
         fields = ['id', 'name', 'website', 'address',
-                  'farm_size_approx', 'survey_answers', 'fields']
+                  'farm_size_approx', 'survey_answers', 'fields', 'description', 'created']
 
 
 class PersonToRoleToOrgSerializer(serializers.ModelSerializer):

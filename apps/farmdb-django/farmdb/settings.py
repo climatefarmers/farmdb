@@ -28,6 +28,8 @@ DEBUG = os.getenv('DEBUG', False)
 
 ALLOWED_HOSTS = ['*']
 
+CORS_ORIGIN_WHITELIST = ['http://localhost:5000']
+CSRF_TRUSTED_ORIGINS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,11 +63,11 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        #'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES':[
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.TokenAuthentication'
+        #'rest_framework.authentication.BasicAuthentication',
+        #'rest_framework.authentication.TokenAuthentication'
     ]
 }
 
