@@ -13,47 +13,18 @@ from rest_framework import authentication, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views import generic
+from rest_framework import viewsets
 
 from .models import Field, Farm
-from .serializers import PersonToRoleToOrgSerializer
+from .serializers import PersonToRoleToOrgSerializer, FarmSerializer
 from .utils.survey.parser import parse_survey
 
 
 
-class FarmsView(generic.ListView):
-    template_name = "farms.html"
-    model = Farm
+class FarmsViewSet(viewsets.ModelViewSet):
+    serializer_class = FarmSerializer
+    queryset = Farm.objects.all().order_by('name')
 
-
-class FarmDetail(generic.DetailView):
-    template_name = "farm_detail.html"
-    model = Farm
-
-
-
-    def get_context_data(self, **kwargs):
-        """Return the view context data."""
-        context = super().get_context_data(**kwargs)
-        farm_fields = Field.objects.filter(farm=context['farm'])
-        context["fields"] = json.loads(serialize("geojson", farm_fields))
-        print(context)
-        return context
-
-
-class FieldsMapView(TemplateView):
-    """Fields map view."""
-
-    template_name = "map.html"
-
-    def get_context_data(self, **kwargs):
-        """Return the view context data."""
-        context = super().get_context_data(**kwargs)
-        context["fields"] = json.loads(serialize("geojson", Field.objects.all()))
-        return context
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the FarmDB index.")
 
 
 # Create your views here.
