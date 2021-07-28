@@ -17,9 +17,9 @@ spec:
         image: climatefarmers/farmdb-django:sha-b7171c0
         resources:
           limits:
-            memory: "1Gi"
+            memory: "1500Mi"
           requests:
-            memory: "500Mi"
+            memory: "1000Mi"
         livenessProbe:
           failureThreshold: 3
           httpGet:
