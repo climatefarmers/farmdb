@@ -113,6 +113,9 @@ DATABASES = {
 # Api key for django-adress validation
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
+MONITORING_SVC_URL = os.getenv('MONITORING_SVC_URL')
+ADDRESS_SVC_URL = os.getenv('ADDRESS_SERVICE_ENDPOINT')
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
