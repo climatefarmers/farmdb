@@ -130,7 +130,7 @@ class PersonToRoleToOrg(models.Model):
 class Field(models.Model):
     field_name = models.CharField(max_length=32)
     geom = gismodels.PolygonField(srid=4326)
-    farm = models.ForeignKey('Farm', on_delete=models.PROTECT)
+    farm = models.ForeignKey('Farm', related_name='fields', on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return f"{self.field_name}"
