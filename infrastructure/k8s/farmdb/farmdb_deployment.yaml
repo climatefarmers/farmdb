@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: farmdb-django
-        image: climatefarmers/farmdb-django:sha-fa91f6d
+        image: climatefarmers/farmdb-django:sha-b7171c0
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -76,8 +76,10 @@ spec:
             secretKeyRef:
               name: django-secret
               key: typeform_secret
-        - name: ADDRESS_SERVICE_ENDPOINT
+        - name: ADDRESS_SVC_ENDPOINT
           value: http://localhost:8080/parse/
+        - name: ADDRESS_SVC_ENDPOINT
+          value: http://soil-monitoring.farmdb.svc.cluster.local
         - name: STATIC_BUCKET
           value: cfcommon-static-dev
         - name: GOOGLE_APPLICATION_CREDENTIALS
