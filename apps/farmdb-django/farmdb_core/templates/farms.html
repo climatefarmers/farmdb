@@ -17,20 +17,10 @@
 </style>
 
 <div class="container">
-    <div class="row">
-        <!-- Blog Entries Column -->
-        <div class="col-md-8 mt-3 left">
-            {% for farm in object_list %}
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h2 class="card-title">{{ farm.name }}</h2>
-                    <p class="card-text text-muted h6">{{ farm.created }} | {{ farm.address.raw}} </p>
-                    <p class="card-text">{{post.description|slice:":200" }}</p>
-                    <a href="{% url 'farm_detail' farm.pk  %}" class="btn btn-primary">Read More &rarr;</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+    <ul class="list-group"></ul>
+    {% for farm in object_list %}
+    <a href="{% url 'farm_detail' farm.pk  %}" class="list-group-item list-group-item-action">{{ farm.name }}</a>
+    {% endfor %}
+    </ul>
 </div>
 {%endblock%}

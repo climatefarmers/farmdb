@@ -12,16 +12,16 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container-fluid">
   <div class="row">
-    <div class="col-sm-5" id="farm-info">
+    <div class="col-sm-3" id="farm-info">
+      <a href="{% url 'farms' %}">Back to all farms</a>
       <h1>{% block title %} {{ farm.name }} {% endblock title %}</h1>
-      
       <p class=" text-muted">Website: <a href="{{ farm.website }}">{{ farm.website|default_if_none:"--"  }}</a></p>
       <p class=" text-muted">Address: {{ farm.address.raw|default:"--" }}</p>
-      <a href="{% url 'farms' %}">All farms</a>
+      
     </div>
-    <div class="col-lg-7" id="farm-desc">
+    <div class="col-lg-6" id="farm-desc">
       <h3>Description:</h3>
       <p class="card-text">{{ farm.description | safe }}</p></p>
     </div>
@@ -35,7 +35,7 @@
         {% endfor %}
       </ol>
     </div>
-    <div class="col-lg-9", id="farm-map">
+    <div class="col-lg-6", id="farm-map">
         {{ geojson|json_script:"geojson-data" }}
         <div id="map"></div>
         <script src="{% static 'map.js' %}"></script>
@@ -58,10 +58,6 @@
       left:0;
       height: 500px; 
       width: 100%;
-    }
-
-    #farm-info{
-        background-color: #bee9f7;
     }
 </style>
 

@@ -12,11 +12,11 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container-fluid">
   <div class="row">
-    <div class="col-sm-5" id="farm-info">
+    <div class="col-sm-3" id="farm-info">
+      <a href="{% url 'farm_detail' field.farm.pk  %}">Back to {{ field.farm.name }}</a>
       <h1>{% block title %} {{ field.field_name }} {% endblock title %}</h1>
-      <p class=" text-muted">Farm: <a href="{% url 'farm_detail' field.farm.pk  %}">{{ field.farm.name }}</a></p>
     </div>
 
   </div>
@@ -29,13 +29,22 @@
         <li>Area: {{ specs.area }} ha</li>
       </ul>
     </div>
-    <div class="col-lg-9", id="farm-map">
+    <div class="col-lg-6", id="farm-map">
         {{ geojson|json_script:"geojson-data" }}
         <div id="map"></div>
         <script src="{% static 'map.js' %}"></script>
     </div>
     <div class="col-md-3", id="field-data">
       <h3>Data:</h3>
+      <p>Soilgrids {{ stats.layer }}</p>
+        {% for data in stats.data %}
+          <ul>
+            <li>Min: {{ data.statistics.min|floatformat:2 }} {{ data.unit }}</li>
+            <li>Max: {{ data.statistics.max|floatformat:2 }} {{ data.unit }}</li>
+            <li>Mean: {{ data.statistics.mean|floatformat:2 }} {{ data.unit }}</li>
+            <li>Std: {{ data.statistics.std|floatformat:2 }} {{ data.unit }}</li>
+          </ul>
+        {% endfor %}
   </div>
   </div>
     
@@ -55,10 +64,6 @@
       left:0;
       height: 500px; 
       width: 100%;
-    }
-
-    #farm-info{
-        background-color: #bee9f7;
     }
 </style>
 

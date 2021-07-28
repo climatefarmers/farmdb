@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 
     <head>
         <title>FarmDB</title>
+        <link rel="shortcut icon" href="{%  static 'favicon.ico' %}">
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
         <meta name="google" content="notranslate" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,15 +26,18 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item text-black">
-                            <a class="nav-link text-black font-weight-bold" href="#">About</a>
+                        {% if user.is_authenticated %}
+                        <span class="navbar-text text-white">
+                            Hi {{ user.username }}!
+                        </span>
+                        <li class="nav-item text-white">
+                            <a class="nav-link text-white font-weight-bold" href="{% url 'logout' %}">Log Out</a>
                         </li>
-                        <li class="nav-item text-black">
-                            <a class="nav-link text-black font-weight-bold" href="#">Policy</a>
+                        {% else %}
+                        <li class="nav-item text-white">
+                            <a class="nav-link text-white font-weight-bold" href="{% url 'login' %}">Log In</a>
                         </li>
-                        <li class="nav-item text-black">
-                            <a class="nav-link text-black font-weight-bold" href="#">Contact</a>
-                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -45,5 +50,12 @@
             <p class="m-0 text-dark text-center ">For the farmers</p>
         </footer>
     </body>
+
+    <style>
+
+        #mainNav,.navbar .navbar-default {
+            background: url("{%  static 'banner.png' %}");
+        }
+    </style>
 </html>
 
