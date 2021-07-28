@@ -1,0 +1,64 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block head-extensions %}
+<!-- leaflet style -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+<!-- leaflet bundle -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+{% endblock head-extensions %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3" id="farm-info">
+      <a href="{% url 'farms' %}">Back to all farms</a>
+      <h1>{% block title %} {{ farm.name }} {% endblock title %}</h1>
+      <p class=" text-muted">Website: <a href="{{ farm.website }}">{{ farm.website|default_if_none:"--"  }}</a></p>
+      <p class=" text-muted">Address: {{ farm.address.raw|default:"--" }}</p>
+      
+    </div>
+    <div class="col-lg-6" id="farm-desc">
+      <h3>Description:</h3>
+      <p class="card-text">{{ farm.description | safe }}</p></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3", id="fields-list">
+      <h3>Fields:</h3>
+      <ol>
+        {% for field in geojson.features %}
+          <li><a href="{% url 'field_detail' field.properties.pk  %}">{{ field.properties.field_name }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+    <div class="col-lg-6", id="farm-map">
+        {{ geojson|json_script:"geojson-data" }}
+        <div id="map"></div>
+        <script src="{% static 'map.js' %}"></script>
+    </div>
+  </div>
+    
+</div>
+
+<style>
+    .container {
+      margin-left: 0;
+      margin-right: 0;
+    }
+    
+    #map {
+      position: inherit;
+      top:0; 
+      bottom:0; 
+      right:0; 
+      left:0;
+      height: 500px; 
+      width: 100%;
+    }
+</style>
+
+{% endblock content %}

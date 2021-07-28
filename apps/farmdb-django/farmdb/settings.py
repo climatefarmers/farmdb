@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'rest_framework',
+    'rest_framework_gis',
     'rest_framework.authtoken',
     'address',
     'farmdb_core.apps.FarmdbCoreConfig',
@@ -56,15 +57,21 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES':[
-        'rest_framework.authentication.TokenAuthentication'
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ]
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 ROOT_URLCONF = 'farmdb.urls'
 
@@ -105,6 +112,9 @@ DATABASES = {
 
 # Api key for django-adress validation
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+
+MONITORING_SVC_URL = os.getenv('MONITORING_SVC_URL')
+ADDRESS_SVC_URL = os.getenv('ADDRESS_SERVICE_ENDPOINT')
 
 
 # Password validation

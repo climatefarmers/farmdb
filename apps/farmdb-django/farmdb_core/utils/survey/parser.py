@@ -1,6 +1,7 @@
 import os
 import logging
 import requests
+from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
@@ -101,7 +102,7 @@ def split_name(full_name):
 
 def split_street(street):
     escaped_street = street.replace(' ', '%20')
-    r = requests.get(ADDRESS_SERVICE_ENDPOINT + f'?address={escaped_street}')
+    r = requests.get(settings.ADDRESS_SVC_URL + f'?address={escaped_street}')
     data = r.json()
     nr = data['house_number'] if data['house_number'] is not None else ''
     route = data['road'] if data['road'] is not None else ''

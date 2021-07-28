@@ -1,0 +1,26 @@
+{% extends "base.html" %} 
+{% block content %}
+<style>
+    body {
+        font-family: "Roboto", sans-serif;
+        font-size: 18px;
+        background-color: #fdfdfd;
+    }
+    
+    .head_text {
+        color: white;
+    }
+    
+    .card {
+        box-shadow: 0 16px 48px #E3E7EB;
+    }
+</style>
+
+<div class="container">
+    <ul class="list-group"></ul>
+    {% for farm in object_list %}
+    <a href="{% url 'farm_detail' farm.pk  %}" class="list-group-item list-group-item-action">{{ farm.name }}</a>
+    {% endfor %}
+    </ul>
+</div>
+{%endblock%}

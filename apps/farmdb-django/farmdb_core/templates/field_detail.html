@@ -1,0 +1,70 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block head-extensions %}
+<!-- leaflet style -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+<!-- leaflet bundle -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+{% endblock head-extensions %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3" id="farm-info">
+      <a href="{% url 'farm_detail' field.farm.pk  %}">Back to {{ field.farm.name }}</a>
+      <h1>{% block title %} {{ field.field_name }} {% endblock title %}</h1>
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="col-sm-3", id="fields-list">
+      <h3>Attributes:</h3>
+      <ul>
+        <li>Long: {{ specs.longitude }}</li>
+        <li>Lat: {{ specs.latitude }}</li>
+        <li>Area: {{ specs.area }} ha</li>
+      </ul>
+    </div>
+    <div class="col-lg-6", id="farm-map">
+        {{ geojson|json_script:"geojson-data" }}
+        <div id="map"></div>
+        <script src="{% static 'map.js' %}"></script>
+    </div>
+    <div class="col-md-3", id="field-data">
+      <h3>Data:</h3>
+      <p>Soilgrids {{ stats.layer }}</p>
+        {% for data in stats.data %}
+          <ul>
+            <li>Min: {{ data.statistics.min|floatformat:2 }} {{ data.unit }}</li>
+            <li>Max: {{ data.statistics.max|floatformat:2 }} {{ data.unit }}</li>
+            <li>Mean: {{ data.statistics.mean|floatformat:2 }} {{ data.unit }}</li>
+            <li>Std: {{ data.statistics.std|floatformat:2 }} {{ data.unit }}</li>
+          </ul>
+        {% endfor %}
+  </div>
+  </div>
+    
+</div>
+
+<style>
+    .container {
+      margin-left: 0;
+      margin-right: 0;
+    }
+    
+    #map {
+      position: inherit;
+      top:0; 
+      bottom:0; 
+      right:0; 
+      left:0;
+      height: 500px; 
+      width: 100%;
+    }
+</style>
+
+{% endblock content %}

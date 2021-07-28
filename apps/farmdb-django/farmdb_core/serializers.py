@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from address.models import Country, State, Locality, Address
-from .models import (Organization, Role, Person, Farm, PersonToRoleToOrg,
+from .models import (Organization, Field, Role, Person, Farm, PersonToRoleToOrg,
                      SurveyAnswers, CommunicationPreferences)
 from .utils.survey.parser import parse_survey
 
@@ -68,14 +69,23 @@ class RoleSerializer(serializers.ModelSerializer):
         fields = ['role']
 
 
+class FieldSerializer(GeoFeatureModelSerializer):
+    farm = serializers.ReadOnlyField(source='farm.name')
+    
+    class Meta:
+        model = Field
+        fields = ['id', 'field_name', 'farm']
+        geo_field = 'geom'
+
 class FarmSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     survey_answers = SurveyAnswersSerializer()
+    fields = FieldSerializer(many=True, read_only=True)
 
     class Meta:
         model = Farm
-        fields = ['name', 'website', 'address',
-                  'farm_size_approx', 'survey_answers']
+        fields = ['id', 'name', 'website', 'address',
+                  'farm_size_approx', 'survey_answers', 'fields', 'description', 'created']
 
 
 class PersonToRoleToOrgSerializer(serializers.ModelSerializer):
