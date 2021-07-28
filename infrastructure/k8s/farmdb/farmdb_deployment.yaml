@@ -79,7 +79,7 @@ spec:
         - name: ADDRESS_SVC_ENDPOINT
           value: http://localhost:8080/parse/
         - name: ADDRESS_SVC_ENDPOINT
-          value: http://soil-monitoring.farmdb.svc.cluster.local
+          value: http://soil-monitoring-service.farmdb.svc.cluster.local
         - name: STATIC_BUCKET
           value: cfcommon-static-dev
         - name: GOOGLE_APPLICATION_CREDENTIALS
