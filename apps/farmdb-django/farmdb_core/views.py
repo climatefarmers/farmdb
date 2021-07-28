@@ -14,33 +14,30 @@ from django.contrib.gis.db.models.functions import Centroid, AsGeoJSON
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views import generic
-
+from rest_framework import viewsets
 from .models import Field, Farm
-from .serializers import PersonToRoleToOrgSerializer
+from .serializers import PersonToRoleToOrgSerializer, FarmSerializer
 from .utils.survey.parser import parse_survey
+import requests
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
 
-
-
-class FarmsView(generic.ListView):
+class FarmsView(LoginRequiredMixin, generic.ListView):
     template_name = "farms.html"
     model = Farm
 
-
-class FarmDetail(generic.DetailView):
+class FarmDetail(LoginRequiredMixin, generic.DetailView):
     template_name = "farm_detail.html"
     model = Farm
-
-
 
     def get_context_data(self, **kwargs):
         """Return the view context data."""
         context = super().get_context_data(**kwargs)
         farm_fields = Field.objects.filter(farm=context['farm'])
         context["geojson"] = json.loads(serialize("geojson", farm_fields))
-        print(context)
         return context
 
-class FieldDetail(generic.DetailView):
+class FieldDetail(LoginRequiredMixin, generic.DetailView):
     template_name = "field_detail.html"
     model = Field
 
@@ -48,6 +45,9 @@ class FieldDetail(generic.DetailView):
         """Return the view context data."""
         context = super().get_context_data(**kwargs)
         context["geojson"] = json.loads(serialize("geojson", [context['field']]))
+
+        res = requests.post(settings.MONITORING_SVC_URL + '/soilgrids/ocs_0-30cm_mean', json=context['geojson'])
+        context["stats"] = res.json()
 
         centroid = context['field'].geom.centroid
 
@@ -58,20 +58,13 @@ class FieldDetail(generic.DetailView):
         }
         return context
 
-class FieldsMapView(TemplateView):
-    """Fields map view."""
 
-    template_name = "map.html"
-
-    def get_context_data(self, **kwargs):
-        """Return the view context data."""
-        context = super().get_context_data(**kwargs)
-        context["fields"] = json.loads(serialize("geojson", Field.objects.all()))
-        return context
-
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the FarmDB index.")
+###########################################################################################
+# API Views
+###########################################################################################
+class FarmsViewSet(viewsets.ModelViewSet):
+    serializer_class = FarmSerializer
+    queryset = Farm.objects.all().order_by('name')
 
 
 # Create your views here.
