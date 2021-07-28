@@ -15,11 +15,6 @@ spec:
       containers:
       - name: farmdb-django
         image: climatefarmers/farmdb-django:sha-b7171c0
-        resources:
-          limits:
-            memory: "2000Mi"
-          requests:
-            memory: "1500Mi"
         livenessProbe:
           failureThreshold: 3
           httpGet:
