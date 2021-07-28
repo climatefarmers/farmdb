@@ -95,11 +95,6 @@ spec:
 
       - name: address-parser
         image: climatefarmers/address-parser
-        resources:
-          limits:
-            memory: "500Mi"
-          requests:
-            memory: "200Mi"
         imagePullPolicy: Always
       
       volumes:
