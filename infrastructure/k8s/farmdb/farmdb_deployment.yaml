@@ -15,6 +15,11 @@ spec:
       containers:
       - name: farmdb-django
         image: climatefarmers/farmdb-django:sha-b7171c0
+        resources:
+          limits:
+            memory: "1Gi"
+          requests:
+            memory: "500Mi"
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -95,7 +100,13 @@ spec:
 
       - name: address-parser
         image: climatefarmers/address-parser
+        resources:
+          limits:
+            memory: "200Mi"
+          requests:
+            memory: "100Mi"
         imagePullPolicy: Always
+      
       volumes:
       - name: static-secret
         secret:
