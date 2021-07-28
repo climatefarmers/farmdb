@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: soil-monitoring
-        image: climatefarmers/soil-monitoring:sha-6c88efa
+        image: climatefarmers/soil-monitoring:latest
         resources:
           limits:
             memory: "500Mi"
