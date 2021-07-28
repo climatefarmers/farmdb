@@ -54,5 +54,5 @@ variable "node_count" {
 
 variable "node_tier" {
     description = "The tier of the machines in the node pool"
-    default = "e2-medium"
+    default = "e2-standard-2"
 }
