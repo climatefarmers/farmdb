@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: farmdb-django-deployment
+  name: farmdb-dev-django-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: farmdb-django-deployment
+      app: farmdb-dev-django-deployment
   template:
     metadata:
       labels:
-        app: farmdb-django-deployment
+        app: farmdb-dev-django-deployment
     spec:
       containers:
       - name: farmdb-django
@@ -84,6 +84,8 @@ spec:
           value: cfcommon-static-dev
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: "/etc/static/credentials.json"
+        - name: DEBUG
+          value: 'true'
         volumeMounts:
         - name: static-secret
           mountPath: "/etc/static"
