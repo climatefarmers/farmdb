@@ -15,7 +15,6 @@ spec:
     http:
       paths:
       - path: /*
-        pathType: Prefix
         backend:
           service:
             name: farmdb-service
