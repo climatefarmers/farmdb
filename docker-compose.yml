@@ -4,12 +4,12 @@ services:
   web:
     image: climatefarmers/farmdb-django:latest
     build: 
-        context: ./apps/farmdb-django
+        context: ./farmdb-django
         dockerfile: ./farmdb.Dockerfile
     entrypoint: ["sh"]
     command: ["entrypoint.sh"]
     volumes:
-      - ./apps/farmdb-django/:/code/
+      - ./farmdb-django/:/code/
     env_file: 
       - .env.dev
     ports: 
