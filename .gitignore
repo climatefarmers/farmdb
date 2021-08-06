@@ -103,7 +103,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+.env*
 .venv
 env/
 venv/
@@ -170,4 +170,3 @@ terraform.rc
 
 # Ignore local dev files
 data/
-docker-compose.yml

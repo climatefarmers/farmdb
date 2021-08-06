@@ -1,50 +1,52 @@
 # farmdb
 FarmDB is Climate Farmers internal database system for connecting farms, consultants, practices, modelled scenarios and metrics
 
-## How to run
+## For local development and testing
+
+Prerequisites: 
+- docker
+- docker-compose
+
 1) First you need to clone the git repo.
-1) You will need `python3` and `pipenv` which is normally supplied by your operating system
-1) As we are using python 3.8 you might need to install pyenv if you are using
-   a newer (or older) version.  https://github.com/pyenv/pyenv
+2) create a .env.dev file to manage environment variables. The following list contains defaults for local development. Chose your own secrets. The .env.dev file is ignored by git and should remain so. Next you find the needed environment variables listed:
 
-1) If you are planing on developing for farmdb you need to install all the packages with:
-   ```
-   $ pipenv install --system --dev --ignore-pipfile
-   ```
+**Development settings**:
+PGNAME=farmdb
+PGUSER=your_postgres_user
+PGPASS=your_postgres_password
+PGHOST=db
+PGPORT=5432
+DEBUG=true
+DJANGO_SECRET_KEY=your_django_secret
+ADDRESS_SERVICE_ENDPOINT=http://address:8080/parse/
+MONITORING_SVC_URL=http://monitoring:5000
 
-   Don't forget to enable the env with:
-   ```
-   $ pipenv shell
-   ```
+Optional, for the address widget in the django admin panel:
+GOOGLE_API_KEY=your_google_api_key_with_maps_api_activated
 
-1) You will need to install postgis (https://wiki.openstreetmap.org/wiki/PostGIS/Installation) which is an extension of postgresql
+3) Start all services using docker-compose --env-file .env.dev up
+4) Perform initial migrations by running:
+docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py migrate
 
-1) Please edit the `bin/dev_setup.sh` file accordingly to your setup
-   
-   Then import it into your local shell
+4) Configure a django admin user by running
+docker-compose exec web python manage.py createsuperuser
 
-   ```
-   $ source bin/dev_setup.sh
-   ```
-
-1) Then you need to create the `farmdb` database with
-   ```
-   createdb farmdb
-   ```
-
-1) Now that you have all the DB setup you can migrate with
-   ```
-   $ ./src/manage.py migrate
-   ```
-
-1) And you can finally run the server with 
-   ```
-   ./src/manage.py runserver
-   ```
-
-   You might want to create a user first with 
-   ```
-   ./src/manage.py createsuperuser
-   ```
+5) Navigate to localhost:8000 in your browser and use your credentials to login
+Other routes:
+/admin - the django admin panel
+/api - the django rest framework documentation
 
 
+For now your local dev environment will not contain any farms to work with. You can add some manually in the admin panel. 
+
+The "real" farmdb is cloud hosted with protected access. 
+
+## Contributing
+
+Climate Farmers has a large community of Open Source contributors that are currently coordinating via slack: climatefarmer-djr8071.slack.com
+
+### Get started:
+Have a look at the open issues listed in this repository to get an idea of what tasks we might need help with. 
+If you find typos or points that you believe could be clearer in this documentation you could also submit your updates. 
+Lastly we're always grateful for people who bring to our attention issues and improvements that you found with our code. 
