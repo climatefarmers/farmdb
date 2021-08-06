@@ -17,7 +17,7 @@ services:
   address:
     image: climatefarmers/address-parser:latest
     build: 
-      context: ./apps/address_parser
+      context: ./farmdb-django/farmdb_core/utils/address_parser
     ports: 
       - 8080:8080
   monitoring:
