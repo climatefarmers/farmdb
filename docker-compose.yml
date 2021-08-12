@@ -6,8 +6,8 @@ services:
     build: 
         context: ./farmdb-django
         dockerfile: ./farmdb.Dockerfile
-    entrypoint: ["sh"]
-    command: ["entrypoint.sh"]
+    entrypoint: ["python"]
+    command: ["manage.py", "runserver" ,"0.0.0.0:8000"]
     volumes:
       - ./farmdb-django/:/code/
     env_file: 
